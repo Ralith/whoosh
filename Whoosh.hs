@@ -2,6 +2,7 @@ module Whoosh where
 
 import System.Random
 import Control.Monad.State
+import Text.Printf
 
 data Gun = Gun { muzzleVelocity :: Double -- m/s
                , barrelLength :: Double -- m
@@ -12,9 +13,12 @@ data Gun = Gun { muzzleVelocity :: Double -- m/s
 instance Show Gun where
     show (Gun mv barl bull cal)
         = "gun having " ++
-          "muzzle velocity of " ++ show mv ++ "m/s, " ++
-          "a " ++ show (barl*10) ++ "cm barrel, " ++
-          "firing " ++ show (cal*100) ++ "x" ++ show (bull*100) ++ "mm bullets"
+          "muzzle velocity of " ++ fmt mv ++ "m/s, " ++
+          "a " ++ fmt (barl*10) ++ "cm barrel, " ++
+          "firing " ++ fmt (cal*100) ++ "x" ++ fmt (bull*100) ++ "mm bullets"
+        where
+          fmt :: Double -> String
+          fmt x = printf "%0.2f" x
 
 main = do
   gen <- newStdGen
