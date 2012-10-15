@@ -14,8 +14,8 @@ instance Show Gun where
     show (Gun mv barl bull cal)
         = "gun having " ++
           "muzzle velocity of " ++ fmt mv ++ "m/s, " ++
-          "a " ++ fmt (barl*10) ++ "cm barrel, " ++
-          "firing " ++ fmt (cal*100) ++ "x" ++ fmt (bull*100) ++ "mm bullets"
+          "a " ++ fmt (barl*100) ++ "cm barrel, " ++
+          "firing " ++ fmt (cal*1000) ++ "x" ++ fmt (bull*1000) ++ "mm bullets"
         where
           fmt :: Double -> String
           fmt x = printf "%0.2f" x
@@ -37,20 +37,20 @@ normal mean stddev = state (\gen -> let (val, gen') = boxMuller gen in
 mass :: Floating a => a -> a -> a
 mass velocity kineticEnergy = 2 * kineticEnergy / velocity ** 2 -- kg
 
-densityOfLead :: Floating a => a
-densityOfLead = 11340 -- kg/m^3
+bulletDensity :: Floating a => a
+bulletDensity = 7800 -- kg/m^3
 
-diameterOfCylinder :: Floating a => a -> a -> a -> a
-diameterOfCylinder mass density length = 2 * sqrt (mass/(density * pi * length))
+diameterOfBullet :: Floating a => a -> a -> a -> a -> a
+diameterOfBullet shape mass density length = 2 * sqrt (mass/(density * pi * length * shape))
 
 genGun :: State StdGen Gun
 genGun = do
-  mv <- normal 715 200
+  mv <- normal 715 300
   ke <- normal 1800 400
   let typicalMass = mass mv ke
-      barrelLen = mv / 100
+      barrelLen = mv / 1000
   return Gun { muzzleVelocity = mv
              , barrelLength = barrelLen
              , bulletLength = barrelLen / 50
-             , caliber = diameterOfCylinder typicalMass densityOfLead barrelLen
+             , caliber = diameterOfBullet (2/5) typicalMass bulletDensity barrelLen
              }
