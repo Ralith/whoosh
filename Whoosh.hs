@@ -45,12 +45,13 @@ diameterOfBullet shape mass density length = 2 * sqrt (mass/(density * pi * leng
 
 genGun :: State StdGen Gun
 genGun = do
-  mv <- normal 715 300
-  ke <- normal 1800 400
+  mv <- normal 715 300 -- m/s
+  ke <- normal 1800 400 -- joules
   let typicalMass = mass mv ke
       barrelLen = mv / 1000
+      bulletLen = barrelLen / 50
   return Gun { muzzleVelocity = mv
              , barrelLength = barrelLen
-             , bulletLength = barrelLen / 50
-             , caliber = diameterOfBullet (2/5) typicalMass bulletDensity barrelLen
+             , bulletLength = bulletLen
+             , caliber = diameterOfBullet (2/5) typicalMass bulletDensity bulletLen
              }
