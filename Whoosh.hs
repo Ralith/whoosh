@@ -38,7 +38,7 @@ mass :: Floating a => a -> a -> a
 mass velocity kineticEnergy = 2 * kineticEnergy / velocity ** 2 -- kg
 
 bulletDensity :: Floating a => a
-bulletDensity = 7800 -- kg/m^3
+bulletDensity = 10000 -- kg/m^3
 
 diameterOfBullet :: Floating a => a -> a -> a -> a -> a
 diameterOfBullet shape mass density length = 2 * sqrt (mass/(density * pi * length * shape))
