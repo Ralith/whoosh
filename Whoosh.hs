@@ -51,12 +51,12 @@ genGun = do
   ke <- normal 1800 400 -- joules
   let typicalMass = mass mv ke
       barrelLen = mv / 1000
-      bulletLen = barrelLen / 20
+      bulletLen = barrelLen / 15
       cal = diameterOfBullet (2/5) typicalMass bulletDensity bulletLen
-  magVolume <- normal 0.0001 0.00001 -- 100cm^3, 10cm^3 stddev
+  magVolume <- normal 0.0001 0.00005 -- 100cm^3, 10cm^3 stddev
   return Gun { muzzleVelocity = mv
              , barrelLength = barrelLen
              , bulletLength = bulletLen
              , caliber = cal
-             , roundsPerMag = floor $ magVolume / (pi * bulletLen * (cal / 2) ** 2)
+             , roundsPerMag = floor $ magVolume / (pi * bulletLen * (cal / 2) ** 2 + ke / 500000000)
              }
