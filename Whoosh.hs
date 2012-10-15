@@ -51,6 +51,6 @@ genGun = do
       barrelLen = mv / 100
   return Gun { muzzleVelocity = mv
              , barrelLength = barrelLen
-             , bulletLength = barrelLen / 10
+             , bulletLength = barrelLen / 50
              , caliber = diameterOfCylinder typicalMass densityOfLead barrelLen
              }
