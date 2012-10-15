@@ -3,14 +3,18 @@ module Whoosh where
 import System.Random
 import Control.Monad.State
 
-data Gun = Gun { kineticEnergy  :: Double
-               , muzzleVelocity :: Double
+data Gun = Gun { muzzleVelocity :: Double -- m/s
+               , barrelLength :: Double -- m
+               , bulletLength :: Double -- m
+               , caliber :: Double -- m
                }
 
 instance Show Gun where
-    show (Gun ke mv) = "gun having " ++
-                       "muzzle velocity of " ++ show mv ++ " m/s, " ++
-                       "kinetic energy of " ++ show ke ++ " joules"
+    show (Gun mv barl bull cal)
+        = "gun having " ++
+          "muzzle velocity of " ++ show mv ++ "m/s, " ++
+          "a " ++ show (barl*10) ++ "cm barrel, " ++
+          "firing " ++ show (bull*100) ++ "x" ++ show (cal*100) ++ "mm bullets"
 
 main = do
   gen <- newStdGen
@@ -26,10 +30,23 @@ normal :: Double -> Double -> State StdGen Double
 normal mean stddev = state (\gen -> let (val, gen') = boxMuller gen in
                                     (val * stddev + mean, gen'))
 
+mass :: Floating a => a -> a -> a
+mass velocity kineticEnergy = 2 * kineticEnergy / velocity ** 2 -- kg
+
+densityOfLead :: Floating a => a
+densityOfLead = 11340 -- kg/m^3
+
+diameterOfCylinder :: Floating a => a -> a -> a -> a
+diameterOfCylinder mass density length = 2 * sqrt (mass/(density * pi * length))
+
 genGun :: State StdGen Gun
 genGun = do
   mv <- normal 715 200
   ke <- normal 1800 400
-  return Gun { kineticEnergy = ke
-             , muzzleVelocity = mv
+  let typicalMass = mass mv ke
+      barrelLen = mv / 1000
+  return Gun { muzzleVelocity = mv
+             , barrelLength = barrelLen
+             , bulletLength = barrelLen / 10
+             , caliber = diameterOfCylinder typicalMass densityOfLead barrelLen
              }
