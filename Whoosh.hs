@@ -14,7 +14,7 @@ instance Show Gun where
         = "gun having " ++
           "muzzle velocity of " ++ show mv ++ "m/s, " ++
           "a " ++ show (barl*10) ++ "cm barrel, " ++
-          "firing " ++ show (bull*100) ++ "x" ++ show (cal*100) ++ "mm bullets"
+          "firing " ++ show (cal*100) ++ "x" ++ show (bull*100) ++ "mm bullets"
 
 main = do
   gen <- newStdGen
@@ -44,7 +44,7 @@ genGun = do
   mv <- normal 715 200
   ke <- normal 1800 400
   let typicalMass = mass mv ke
-      barrelLen = mv / 1000
+      barrelLen = mv / 100
   return Gun { muzzleVelocity = mv
              , barrelLength = barrelLen
              , bulletLength = barrelLen / 10
