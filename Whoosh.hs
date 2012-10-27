@@ -6,23 +6,39 @@ import Text.Printf
 
 data Gun = Gun { muzzleVelocity :: Double -- m/s
                , barrelLength :: Double -- m
-               , bulletLength :: Double -- m
-               , caliber :: Double -- m
+               , cartridge :: Cartridge
                }
 
-instance Show Gun where
-    show (Gun mv barl bull cal)
-        = "gun having " ++
-          "muzzle velocity of " ++ fmt mv ++ "m/s, " ++
-          "a " ++ fmt (barl*100) ++ "cm barrel, " ++
-          "firing " ++ fmt (cal*1000) ++ "x" ++ fmt (bull*1000) ++ "mm bullets"
-        where
-          fmt :: Double -> String
-          fmt x = printf "%0.2f" x
+data Bullet = Bullet { bulletCaliber :: Double
+                     , bulletLength :: Double
+                     }
 
-main = do
-  gen <- newStdGen
-  putStrLn $ show $ evalState genGun gen
+data Cartridge = Cartridge { bullet :: Bullet
+                           , powderMass :: Double
+                           }
+
+fmtDouble :: Double -> String
+fmtDouble x = printf "%0.2f" x
+
+instance Show Gun where
+    show (Gun mv barl cart)
+        = "gun having " ++
+          "a " ++ fmtDouble (barl*100) ++ "cm barrel, " ++
+          "typically firing a " ++ show cart ++ " " ++
+          "at " ++ fmtDouble mv ++ "m/s"
+        where
+
+instance Show Cartridge where
+    show (Cartridge b p)
+        = "cartridge containing a " ++ show b ++ " and " ++ fmtDouble (p*1000) ++ " grams of powder"
+
+instance Show Bullet where
+    show (Bullet cal len)
+        = fmtDouble (cal*100) ++ "x" ++ fmtDouble (len*100) ++ "mm bullet"
+
+-- main = do
+--   gen <- newStdGen
+--   putStrLn $ show $ evalState genGun gen
 
 -- Generate a Gaussian (0, 1) variate.
 boxMuller :: (Random a, Floating a) => StdGen -> (a, StdGen)
@@ -38,26 +54,3 @@ lognormal :: (Random a, Floating a) => a -> a -> State StdGen a
 lognormal minimum shape
     = state (\gen -> let (x, gen') = boxMuller gen in
                      (exp (minimum + shape * x), gen'))
-
-mass :: Floating a => a -> a -> a
-mass velocity kineticEnergy = 2 * kineticEnergy / velocity ** 2 -- kg
-
-bulletDensity :: Floating a => a
-bulletDensity = 10000 -- kg/m^3
-
-diameterOfBullet :: Floating a => a -> a -> a -> a -> a
-diameterOfBullet shape mass density length = 2 * sqrt (mass/(density * pi * length * shape))
-
-genGun :: State StdGen Gun
-genGun = do
-  mv <- normal 715 300 -- m/s
-  ke <- normal 1800 400 -- joules
-  let typicalMass = mass mv ke
-      barrelLen = mv / 1000
-      bulletLen = barrelLen / 15
-      cal = diameterOfBullet (2/5) typicalMass bulletDensity bulletLen
-  return Gun { muzzleVelocity = mv
-             , barrelLength = barrelLen
-             , bulletLength = bulletLen
-             , caliber = cal
-             }
