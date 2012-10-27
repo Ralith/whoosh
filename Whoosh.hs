@@ -27,14 +27,19 @@ main = do
   putStrLn $ show $ evalState genGun gen
 
 -- Generate a Gaussian (0, 1) variate.
-boxMuller :: StdGen -> (Double, StdGen)
+boxMuller :: (Random a, Floating a) => StdGen -> (a, StdGen)
 boxMuller gen = (sqrt (-2 * log u1) * cos (2 * pi * u2), gen'')
     where (u1, gen')  = randomR (0, 1) gen
           (u2, gen'') = randomR (0, 1) gen'
 
-normal :: Double -> Double -> State StdGen Double
+normal :: (Random a, Floating a) => a -> a -> State StdGen a
 normal mean stddev = state (\gen -> let (val, gen') = boxMuller gen in
                                     (val * stddev + mean, gen'))
+
+lognormal :: (Random a, Floating a) => a -> a -> State StdGen a
+lognormal minimum shape
+    = state (\gen -> let (x, gen') = boxMuller gen in
+                     (exp (minimum + shape * x), gen'))
 
 mass :: Floating a => a -> a -> a
 mass velocity kineticEnergy = 2 * kineticEnergy / velocity ** 2 -- kg
