@@ -8,16 +8,14 @@ data Gun = Gun { muzzleVelocity :: Double -- m/s
                , barrelLength :: Double -- m
                , bulletLength :: Double -- m
                , caliber :: Double -- m
-               , roundsPerMag :: Int
                }
 
 instance Show Gun where
-    show (Gun mv barl bull cal rnds)
+    show (Gun mv barl bull cal)
         = "gun having " ++
           "muzzle velocity of " ++ fmt mv ++ "m/s, " ++
           "a " ++ fmt (barl*100) ++ "cm barrel, " ++
-          "firing " ++ fmt (cal*1000) ++ "x" ++ fmt (bull*1000) ++ "mm bullets, " ++
-          "with a " ++ (show rnds) ++ " round magazine"
+          "firing " ++ fmt (cal*1000) ++ "x" ++ fmt (bull*1000) ++ "mm bullets"
         where
           fmt :: Double -> String
           fmt x = printf "%0.2f" x
@@ -58,10 +56,8 @@ genGun = do
       barrelLen = mv / 1000
       bulletLen = barrelLen / 15
       cal = diameterOfBullet (2/5) typicalMass bulletDensity bulletLen
-  magVolume <- normal 0.0001 0.00005 -- 100cm^3, 10cm^3 stddev
   return Gun { muzzleVelocity = mv
              , barrelLength = barrelLen
              , bulletLength = bulletLen
              , caliber = cal
-             , roundsPerMag = floor $ magVolume / (pi * bulletLen * (cal / 2) ** 2 + ke / 500000000)
              }
