@@ -45,10 +45,4 @@ instance Show Bullet where
 
 normal mean stddev = state $ sample (Normal mean stddev)
 
-lognormal minimum shape scale = state $ sample (LogNormal minimum shape scale)
-
-genCartridge :: State StdGen (Float, Float)
-genCartridge = do
-  bulletMass <- lognormal 0.1 0.5 10
-  kineticEnergy <- lognormal 0.001 1 1000
-  return (bulletMass, kineticEnergy)
+lognormal minimum shape = state $ sample (LogNormal minimum shape)
