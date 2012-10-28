@@ -4,6 +4,8 @@ import System.Random
 import Control.Monad.State
 import Text.Printf
 
+import Distributions
+
 data Gun = Gun { muzzleVelocity :: Double -- m/s
                , barrelLength :: Double -- m
                , cartridge :: Cartridge
@@ -40,17 +42,13 @@ instance Show Bullet where
 --   gen <- newStdGen
 --   putStrLn $ show $ evalState genGun gen
 
--- Generate a Gaussian (0, 1) variate.
-boxMuller :: (Random a, Floating a) => StdGen -> (a, StdGen)
-boxMuller gen = (sqrt (-2 * log u1) * cos (2 * pi * u2), gen'')
-    where (u1, gen')  = randomR (0, 1) gen
-          (u2, gen'') = randomR (0, 1) gen'
 
-normal :: (Random a, Floating a) => a -> a -> State StdGen a
-normal mean stddev = state (\gen -> let (val, gen') = boxMuller gen in
-                                    (val * stddev + mean, gen'))
+normal mean stddev = state $ sample (Normal mean stddev)
 
-lognormal :: (Random a, Floating a) => a -> a -> State StdGen a
-lognormal minimum shape
-    = state (\gen -> let (x, gen') = boxMuller gen in
-                     (exp (minimum + shape * x), gen'))
+lognormal minimum shape scale = state $ sample (LogNormal minimum shape scale)
+
+genCartridge :: State StdGen (Float, Float)
+genCartridge = do
+  bulletMass <- lognormal 0.1 0.5 10
+  kineticEnergy <- lognormal 0.001 1 1000
+  return (bulletMass, kineticEnergy)
