@@ -4,17 +4,18 @@ import System.Random
 
 data Distribution
     = Normal Rational Rational
-    | LogNormal Rational Rational
+    | LogNormal Rational Rational Rational Rational
     | Gibbs [(Rational, Distribution)]
 
 mean :: Floating a => Distribution -> a
 mean (Normal mu _) = fromRational mu
-mean (LogNormal mu sigma) = exp ((fromRational mu) + (fromRational sigma)**2/2)
+mean (LogNormal mu sigma z c)
+    = (fromRational z) + (fromRational c) * exp ((fromRational mu) + (fromRational sigma)**2/2)
 mean (Gibbs ds) = foldl (\accum (weight, d) -> (fromRational weight) * (mean d)) 0 ds
 
 median :: Floating a => Distribution -> a
 median (Normal mu _) = fromRational mu
-median (LogNormal mu _) = exp (fromRational mu)
+median (LogNormal mu _ z c) = (fromRational z) + (fromRational c) * exp (fromRational mu)
 median (Gibbs ds) = foldl (\accum (weight, d) -> (fromRational weight) * (median d)) 0 ds -- TODO: Verify
 
 -- mode :: Floating a => Distribution -> a
@@ -26,9 +27,9 @@ pdf :: Floating a => Distribution -> a -> a
 pdf (Normal mu sigma) x
     = exp (- (x - (fromRational mu))**2/(2*(fromRational sigma)**2))
       / ((fromRational sigma) * sqrt (2*pi))
-pdf (LogNormal mu sigma) x
-    = exp (- (log x - (fromRational mu))**2/(2*(fromRational sigma)**2))
-      / (x * sqrt (2*pi*(fromRational sigma)**2))
+pdf (LogNormal mu sigma z c) x
+    = exp (- (log ((x - fromRational z)/(fromRational c)) - (fromRational mu))**2/(2*(fromRational sigma)**2))
+      / ((fromRational c) * ((x - fromRational z)/(fromRational c)) * sqrt (2*pi*(fromRational sigma)**2))
 pdf (Gibbs ds) x = foldl (\accum (weight, d) -> accum + (fromRational weight) * pdf d x) 0 ds
 
 -- Generate a Gaussian (0, 1) variate.
@@ -41,9 +42,9 @@ sample :: (RandomGen g, Floating a, Random a) => Distribution -> g -> (a, g)
 sample (Normal mu sigma) g
     = let (x, g') = boxMuller g in
       ((fromRational mu)+x*(fromRational sigma), g')
-sample (LogNormal mu sigma) g
+sample (LogNormal mu sigma z c) g
     = let (x, g') = boxMuller g in
-      (exp ((fromRational mu) + (fromRational sigma) * x), g')
+      ((fromRational z) + (fromRational c) * exp ((fromRational mu) + (fromRational sigma) * x), g')
 sample (Gibbs ds) g
     = let (x, g') = randomR (0, 1) g in
       sample (pick x ds) g'
