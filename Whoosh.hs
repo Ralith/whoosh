@@ -5,6 +5,7 @@ import Control.Monad.State
 import Text.Printf
 
 import Distributions
+import Graph
 
 data Gun = Gun { muzzleVelocity :: Double -- m/s
                , barrelLength :: Double -- m
@@ -45,4 +46,16 @@ instance Show Bullet where
 
 normal mean stddev = state $ sample (Normal mean stddev)
 
-lognormal minimum shape = state $ sample (LogNormal minimum shape)
+lognormal mu sigma zero scale = state $ sample (LogNormal mu sigma zero scale)
+
+energy :: State StdGen Double
+energy = lognormal 1 1 100 1000
+
+mass :: State StdGen Double
+mass = lognormal 0.1 0.5 1 10
+
+genCartridge :: State StdGen (Double, Double)
+genCartridge = do
+  e <- energy
+  m <- mass
+  return (e, m)
