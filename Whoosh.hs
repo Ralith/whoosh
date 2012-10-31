@@ -48,14 +48,14 @@ normal mean stddev = state $ sample (Normal mean stddev)
 
 lognormal mu sigma zero scale = state $ sample (LogNormal mu sigma zero scale)
 
-energy :: State StdGen Double
-energy = lognormal 1 1 100 1000
+genEnergy :: State StdGen Double
+genEnergy = lognormal 1 0.75 100 1000
 
-mass :: State StdGen Double
-mass = lognormal 0.1 0.5 1 10
+genMass :: State StdGen Double
+genMass = lognormal 0.1 0.5 1 10
 
 genCartridge :: State StdGen (Double, Double)
 genCartridge = do
-  e <- energy
-  m <- mass
+  e <- genEnergy
+  m <- genMass
   return (e, m)
