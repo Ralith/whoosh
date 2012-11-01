@@ -21,7 +21,7 @@ data Cartridge = Cartridge { bullet :: Bullet
                            }
 
 fmtDouble :: Double -> String
-fmtDouble x = printf "%0.2f" x
+fmtDouble = printf "%0.2f"
 
 instance Show Gun where
     show (Gun mv barl cart)
