@@ -41,7 +41,7 @@ instance Show Bullet where
 main :: IO ()
 main = do
   gen <- newStdGen
-  putStrLn $ show $ evalState genCartridge gen
+  putStrLn $ show $ evalState genGun gen
 
 
 normal :: (Floating a, Random a) => Rational -> Rational -> State StdGen a
@@ -56,8 +56,8 @@ genEnergy = lognormal 1 0.75 100 1000
 genMass :: State StdGen Double
 genMass = lognormal 0.1 0.5 1 10
 
-genCartridge :: State StdGen (Double, Double)
-genCartridge = do
+genGun :: State StdGen (Double, Double)
+genGun = do
   baseEnergy <- genEnergy
   mass <- genMass
   massFactor <- lognormal 1 0.5 0 100
