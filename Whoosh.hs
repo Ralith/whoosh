@@ -38,9 +38,10 @@ instance Show Bullet where
     show (Bullet cal len)
         = fmtDouble (cal*1000) ++ "x" ++ fmtDouble (len*1000) ++ "mm bullet"
 
--- main = do
---   gen <- newStdGen
---   putStrLn $ show $ evalState genGun gen
+main :: IO ()
+main = do
+  gen <- newStdGen
+  putStrLn $ show $ evalState genCartridge gen
 
 
 normal :: (Floating a, Random a) => Rational -> Rational -> State StdGen a
