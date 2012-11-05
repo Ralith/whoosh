@@ -58,6 +58,7 @@ genMass = lognormal 0.1 0.5 1 10
 
 genCartridge :: State StdGen (Double, Double)
 genCartridge = do
-  e <- genEnergy
-  m <- genMass
-  return (e, m)
+  baseEnergy <- genEnergy
+  mass <- genMass
+  massFactor <- lognormal 1 0.5 0 100
+  return (baseEnergy + massFactor * mass, mass)
