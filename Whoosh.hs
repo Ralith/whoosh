@@ -36,7 +36,7 @@ instance Show Cartridge where
 
 instance Show Bullet where
     show (Bullet cal len)
-        = fmtDouble (cal*100) ++ "x" ++ fmtDouble (len*100) ++ "mm bullet"
+        = fmtDouble (cal*1000) ++ "x" ++ fmtDouble (len*1000) ++ "mm bullet"
 
 -- main = do
 --   gen <- newStdGen
