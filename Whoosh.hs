@@ -5,7 +5,6 @@ import Control.Monad.State
 import Text.Printf
 
 import Distributions
-import Graph
 
 data Gun = Gun { muzzleVelocity :: Double -- m/s
                , barrelLength :: Double -- m
