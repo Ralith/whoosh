@@ -43,8 +43,10 @@ instance Show Bullet where
 --   putStrLn $ show $ evalState genGun gen
 
 
-normal mean stddev = state $ sample (Normal mean stddev)
+normal :: (Floating a, Random a) => Rational -> Rational -> State StdGen a
+normal mu sigma = state $ sample (Normal mu sigma)
 
+lognormal :: (Floating a, Random a) => Rational -> Rational -> Rational -> Rational -> State StdGen a
 lognormal mu sigma zero scale = state $ sample (LogNormal mu sigma zero scale)
 
 genEnergy :: State StdGen Double
