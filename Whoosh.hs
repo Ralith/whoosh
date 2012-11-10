@@ -60,5 +60,9 @@ genGun :: State StdGen (Double, Double)
 genGun = do
   baseEnergy <- genEnergy
   mass <- genMass
-  massFactor <- lognormal 1 0.5 0 100
+  massFactor <- lognormal 1 1 0 100
   return (baseEnergy + massFactor * mass, mass)
+
+genBullet :: State StdGen Bullet
+genBullet = do
+  return Bullet { bulletCaliber = 0, bulletLength = 0 }
