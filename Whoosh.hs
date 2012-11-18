@@ -50,6 +50,9 @@ normal mu sigma = state $ sample (Normal mu sigma)
 lognormal :: (Floating a, Random a) => Rational -> Rational -> Rational -> Rational -> State StdGen a
 lognormal mu sigma zero scale = state $ sample (LogNormal mu sigma zero scale)
 
+uniform :: (Floating a, Random a) => a -> a -> State StdGen a
+uniform a b = state $ randomR (a, b)
+
 genEnergy :: State StdGen Double
 genEnergy = lognormal 1 0.75 100 1000
 
