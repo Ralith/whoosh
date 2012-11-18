@@ -11,12 +11,12 @@ mean :: Floating a => Distribution -> a
 mean (Normal mu _) = fromRational mu
 mean (LogNormal mu sigma z c)
     = (fromRational z) + (fromRational c) * exp ((fromRational mu) + (fromRational sigma)**2/2)
-mean (Gibbs ds) = foldl (\accum (weight, d) -> (fromRational weight) * (mean d)) 0 ds
+mean (Gibbs ds) = foldr (\(weight, d) -> (+ (fromRational weight) * (mean d))) 0 ds
 
 median :: Floating a => Distribution -> a
 median (Normal mu _) = fromRational mu
 median (LogNormal mu _ z c) = (fromRational z) + (fromRational c) * exp (fromRational mu)
-median (Gibbs ds) = foldl (\accum (weight, d) -> (fromRational weight) * (median d)) 0 ds -- TODO: Verify
+median (Gibbs ds) = foldr (\(weight, d) -> (+ (fromRational weight) * (median d))) 0 ds -- TODO: Verify
 
 -- mode :: Floating a => Distribution -> a
 -- mode (Normal mu _) = fromRational mu
