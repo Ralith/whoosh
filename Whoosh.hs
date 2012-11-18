@@ -69,7 +69,7 @@ genGun = do
 
 genBullet :: Double -> State StdGen Bullet
 genBullet mass = do
-  aspectRatio <- lognormal 0.5 0.75 1 2
+  aspectRatio <- lognormal 0.5 0.75 1 1
   let density = 11340
   let len = 2**(2/3) * aspectRatio**(2/3) * mass**(1/3) / (pi**(1/3) * density**(1/3))
   return Bullet { bulletCaliber = len/aspectRatio, bulletLength = len }
