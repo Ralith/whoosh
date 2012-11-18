@@ -58,7 +58,7 @@ genEnergy :: State StdGen Double
 genEnergy = lognormal 1 0.75 100 1000
 
 genMass :: State StdGen Double
-genMass = lognormal 0.1 0.5 1 10
+genMass = lognormal 0.1 0.5 0.001 (1/100)
 
 genGun :: State StdGen (Double, Double)
 genGun = do
