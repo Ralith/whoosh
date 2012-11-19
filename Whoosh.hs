@@ -39,14 +39,7 @@ instance Show Cartridge where
 instance Show Bullet where
     show (Bullet cal cyl ogive rho)
         = fmtDouble (cal*1000) ++ "x" ++ fmtDouble ((cyl+ogive)*1000) ++ "mm bullet"
-          ++ "with ρ=" ++ fmtDouble (rho*1000) ++ "mm"
-
-main :: IO ()
-main = do
-  gen <- newStdGen
-  putStrLn $ show $ evalState genGun gen
-  putStrLn $ show $ evalState (genBullet 0.01) gen
-
+          ++ " with ρ=" ++ fmtDouble (rho*1000) ++ "mm"
 
 normal :: (Floating a, Random a) => Rational -> Rational -> State StdGen a
 normal mu sigma = state $ sample (Normal mu sigma)
