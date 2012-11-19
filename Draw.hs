@@ -1,3 +1,4 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
 module Main where
 
 import System.Random
@@ -15,7 +16,9 @@ main = do
   defaultMain $ scale 10 $ foldr1 (|||) $ map bullet $ evalState (replicateM 10 $ genMass >>= genBullet) gen
 
 bullet (Bullet cal cylLen ogiveLen rho) =
-    (ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0
+    ((ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0) <> strutX (cal * 1.1)
+
+dimension size = centerX $ (vrule (size/10) ||| hrule size ||| vrule (size/10)) <> strutX (size * 1.1)
 
 ogive radius rho len baseDepth =
     -- dot norm((rho - radius, olen)) norm((rho, 0))
@@ -27,7 +30,7 @@ ogive radius rho len baseDepth =
              : (straight $ r2 (2*radius, 0))
              : (straight $ r2 (0, baseDepth))
              : []
-    in pathLike (p2 (0, baseDepth)) True (base ++ rarc ++ map reverseSegment larc)
+    in pathLike (p2 (-radius, baseDepth)) True (base ++ rarc ++ map reverseSegment larc)
 
 normalize :: Floating t => (t, t) -> (t, t)
 normalize (x, y) = let len = sqrt (x^2 + y^2)
