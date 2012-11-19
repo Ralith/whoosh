@@ -1,4 +1,7 @@
-module Whoosh where
+module Whoosh ( Bullet(..)
+              , genBullet
+              , genMass
+              ) where
 
 import System.Random
 import Control.Monad.State
