@@ -12,7 +12,8 @@ data Gun = Gun { muzzleVelocity :: Double -- m/s
                }
 
 data Bullet = Bullet { bulletCaliber :: Double
-                     , bulletLength :: Double
+                     , bulletCylinderLen :: Double
+                     , bulletOgiveLen :: Double
                      , bulletRho :: Double
                      }
 
@@ -36,8 +37,8 @@ instance Show Cartridge where
         = "cartridge containing a " ++ show b ++ " and " ++ fmtDouble (p*1000) ++ " grams of powder"
 
 instance Show Bullet where
-    show (Bullet cal len rho)
-        = fmtDouble (cal*1000) ++ "x" ++ fmtDouble (len*1000) ++ "mm bullet"
+    show (Bullet cal cyl ogive rho)
+        = fmtDouble (cal*1000) ++ "x" ++ fmtDouble ((cyl+ogive)*1000) ++ "mm bullet"
           ++ "with ρ=" ++ fmtDouble (rho*1000) ++ "mm"
 
 main :: IO ()
@@ -72,14 +73,21 @@ genGun = do
 genBullet :: Double -> State StdGen Bullet
 genBullet mass = do
   startingRhoFactor <- lognormal 0.5 0.75 1 1
+  cylinderFrac <- uniform (1/4) (3/4)
   let density = 11340 -- Lead, kg/m^3
       a = min 20 startingRhoFactor
-      v = mass / density
+      totalVol = mass / density
+      cylinderVol = cylinderFrac * totalVol
+      ogiveVol = (1 - cylinderFrac) * totalVol
       -- Given rho=2*R*a and the formula for the volume of an ogive, we can obtain:
-      f r = -((24*pi*a^3-12*pi*a^2)*r^3*asin((sqrt(4*a-1)*abs(r))/(2*a*r))+sqrt(4*a-1)*(-24*pi*a^2+16*pi*a-4*pi)*r^2*abs(r)+sqrt(4*a-1)*(6*pi*a-3*pi)*sqrt(4*a^2-4*a+1)*r^3)/3 - v
+      f r = -((24*pi*a^3-12*pi*a^2)*r^3*asin((sqrt(4*a-1)*abs(r))/(2*a*r))+sqrt(4*a-1)*(-24*pi*a^2+16*pi*a-4*pi)*r^2*abs(r)+sqrt(4*a-1)*(6*pi*a-3*pi)*sqrt(4*a^2-4*a+1)*r^3)/3 - ogiveVol
       f' r = -((24*pi*a^3-12*pi*a^2)*r^2*abs(r)*asin((sqrt(4*a-1)*abs(r))/(2*a*r))+sqrt(4*a-1)*(6*pi*a-3*pi)*sqrt(4*a^2-4*a+1)*r^2*abs(r)+sqrt(4*a-1)*(-24*pi*a^2+16*pi*a-4*pi)*r^3)/(abs(r))
       radius = newton f f' 0.01 1e-10
-  return Bullet { bulletCaliber = 2*radius, bulletLength = sqrt(4*a-1)*abs(radius), bulletRho = 2*radius*a }
+      cylinderLen = cylinderVol / (pi * radius^2)
+  return Bullet { bulletCaliber = 2*radius
+                , bulletCylinderLen = cylinderLen
+                , bulletOgiveLen = sqrt(4*a-1)*abs(radius)
+                , bulletRho = 2*radius*a }
 
 newton :: (Floating a, Ord a) => (a -> a) -> (a -> a) -> a -> a -> a
 newton f f' guess tol = helper guess (step guess)
