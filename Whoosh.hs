@@ -65,22 +65,27 @@ genGun = do
 
 genBullet :: Double -> State StdGen Bullet
 genBullet mass = do
-  startingRhoFactor <- lognormal 0.5 0.75 1 1
-  cylinderFrac <- uniform (1/4) (3/4)
+  startingRatio <- lognormal 0.5 0.75 1 1
+  cylinderFrac <- uniform (1/10) (1/3)
   let density = 11340 -- Lead, kg/m^3
-      a = min 20 startingRhoFactor
+      ratio = min 20 startingRatio
       totalVol = mass / density
-      cylinderVol = cylinderFrac * totalVol
-      ogiveVol = (1 - cylinderFrac) * totalVol
-      -- Given rho=2*R*a and the formula for the volume of an ogive, we can obtain:
-      f r = -((24*pi*a^3-12*pi*a^2)*r^3*asin((sqrt(4*a-1)*abs(r))/(2*a*r))+sqrt(4*a-1)*(-24*pi*a^2+16*pi*a-4*pi)*r^2*abs(r)+sqrt(4*a-1)*(6*pi*a-3*pi)*sqrt(4*a^2-4*a+1)*r^3)/3 - ogiveVol
-      f' r = -((24*pi*a^3-12*pi*a^2)*r^2*abs(r)*asin((sqrt(4*a-1)*abs(r))/(2*a*r))+sqrt(4*a-1)*(6*pi*a-3*pi)*sqrt(4*a^2-4*a+1)*r^2*abs(r)+sqrt(4*a-1)*(-24*pi*a^2+16*pi*a-4*pi)*r^3)/(abs(r))
-      radius = newton f f' 0.01 1e-10
-      cylinderLen = cylinderVol / (pi * radius^2)
+      cylinderVol = totalVol * cylinderFrac
+      ogiveVol = totalVol * (1 - cylinderFrac)
+      (radius, ogiveLen, rho) = ogive ogiveVol ratio
   return Bullet { bulletCaliber = 2*radius
-                , bulletCylinderLen = cylinderLen
-                , bulletOgiveLen = sqrt(4*a-1)*abs(radius)
-                , bulletRho = 2*radius*a }
+                , bulletCylinderLen = cylinderVol / (pi * radius^2)
+                , bulletOgiveLen = ogiveLen
+                , bulletRho = rho }
+
+ogive :: (Floating a, Ord a) => a -> a -> (a, a, a)
+ogive volume a =
+    -- Given a = L/(2*R) and the formula for the volume of an ogive, we can obtain:
+    let f r = -((192*pi*a^6+48*pi*a^4-12*pi*a^2-3*pi)*r^3*abs(r)*asin((4*abs(a)*abs(r))/((4*a^2+1)*r))+(48*pi*a^2-12*pi)*sqrt(16*a^4-8*a^2+1)*abs(a)*r^3*abs(r)+(-384*pi*a^4+64*pi*a^2-24*pi)*abs(a)*r^4)/(24*abs(r)) - volume
+        f' r = -((192*pi*a^6+48*pi*a^4-12*pi*a^2-3*pi)*r^2*asin((4*abs(a)*abs(r))/((4*a^2+1)*r))+(-384*pi*a^4+64*pi*a^2-24*pi)*abs(a)*r*abs(r)+(48*pi*a^2-12*pi)*sqrt(16*a^4-8*a^2+1)*abs(a)*r^2)/(8)
+        r = newton f f' 0.01 1e-10
+        rho = (r^2+(2*a*r)^2)/(2*r)
+    in (r, sqrt (2*rho*r-r^2), rho)
 
 newton :: (Floating a, Ord a) => (a -> a) -> (a -> a) -> a -> a -> a
 newton f f' guess tol = helper guess (step guess)
