@@ -3,6 +3,7 @@ module Main where
 
 import System.Random
 import Control.Monad.State
+import Text.Printf
 
 import Diagrams.Prelude
 import Diagrams.TwoD.Arc
@@ -13,12 +14,14 @@ import Whoosh
 main :: IO ()
 main = do
   gen <- newStdGen
-  defaultMain $ hcat $ map bullet $ evalState (replicateM 20 $ genMass >>= genBullet) gen
+  defaultMain $ hcat $ map (scale 10 . bullet) $ evalState (replicateM 20 $ genMass >>= genBullet) gen
 
-bullet (Bullet cal cylLen ogiveLen rho) =
-    ((ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0) <> strutX (cal * 1.1)
+bullet (Bullet cal cylLen ogiveLen rho) = let magic = 500 in
+    (scale magic $ (ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0) === dimension (cal*magic) (cal*1000)
 
-dimension size = centerX $ (vrule (size/10) ||| hrule size ||| vrule (size/10)) <> strutX (size * 1.1)
+dimension size value =
+    ((centerX $ hrule size) <> strutY 1 <> strutX (size * 1.1)) # lw 0.5
+    === (text (printf "%0.2f" value) <> strutY 1 <> strutX 3)
 
 ogive radius rho len baseDepth =
     -- dot norm((rho - radius, olen)) norm((rho, 0))
