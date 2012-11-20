@@ -13,7 +13,7 @@ import Whoosh
 main :: IO ()
 main = do
   gen <- newStdGen
-  defaultMain $ scale 10 $ foldr1 (|||) $ map bullet $ evalState (replicateM 10 $ genMass >>= genBullet) gen
+  defaultMain $ hcat $ map bullet $ evalState (replicateM 20 $ genMass >>= genBullet) gen
 
 bullet (Bullet cal cylLen ogiveLen rho) =
     ((ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0) <> strutX (cal * 1.1)
