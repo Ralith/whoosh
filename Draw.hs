@@ -7,7 +7,7 @@ import Text.Printf
 
 import Diagrams.Prelude
 import Diagrams.TwoD.Arc
-import Diagrams.Backend.Cairo.CmdLine
+import Diagrams.Backend.SVG.CmdLine
 
 import Whoosh
 
@@ -21,7 +21,7 @@ bullet (Bullet cal cylLen ogiveLen rho) = let magic = 500 in
 
 dimension size value =
     ((centerX $ hrule size) <> strutY 1 <> strutX (size * 1.1)) # lw 0.5
-    === (text (printf "%0.2f" value) <> strutY 1 <> strutX 3)
+    === (text (printf "%0.2f" value) # fc black <> strutY 1 <> strutX 3)
 
 ogive radius rho len baseDepth =
     -- dot norm((rho - radius, olen)) norm((rho, 0))
