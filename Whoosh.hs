@@ -14,14 +14,15 @@ data Gun = Gun { muzzleVelocity :: Double -- m/s
                , cartridge :: Cartridge
                }
 
-data Bullet = Bullet { bulletCaliber :: Double
-                     , bulletCylinderLen :: Double
-                     , bulletOgiveLen :: Double
-                     , bulletRho :: Double
+data Bullet = Bullet { bulletCaliber :: Double -- m
+                     , bulletCylinderLen :: Double -- m
+                     , bulletOgiveLen :: Double -- m
+                     , bulletRho :: Double -- m
+                     , bulletMass :: Double -- kg
                      }
 
 data Cartridge = Cartridge { bullet :: Bullet
-                           , powderMass :: Double
+                           , powderMass :: Double -- kg
                            }
 
 fmtDouble :: Double -> String
@@ -79,7 +80,9 @@ genBullet mass = do
   return Bullet { bulletCaliber = 2*radius
                 , bulletCylinderLen = cylinderVol / (pi * radius^2)
                 , bulletOgiveLen = ogiveLen
-                , bulletRho = rho }
+                , bulletRho = rho
+                , bulletMass = mass
+                }
 
 ogive :: (Floating a, Ord a) => a -> a -> (a, a, a)
 ogive volume a =

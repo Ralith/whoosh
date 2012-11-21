@@ -16,12 +16,14 @@ main = do
   gen <- newStdGen
   defaultMain $ hcat $ map (scale 10 . bullet) $ evalState (replicateM 20 $ genMass >>= genBullet) gen
 
-bullet (Bullet cal cylLen ogiveLen rho) = let magic = 500 in
-    (scale magic $ (ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0) === dimension (cal*magic) (cal*1000)
+bullet (Bullet cal cylLen ogiveLen rho mass) = let magic = 500 in
+    (scale magic $ (ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0)
+    === (dimension (cal*magic) (printf "%0.2fmm" (cal*1000)))
+    === (text (printf "%0.2fg" (mass * 1000)) # fc black <> strutY 1.3 <> strutX 3)
 
-dimension size value =
+dimension size annotation =
     ((centerX $ hrule size) <> strutY 1 <> strutX (size * 1.1)) # lw 0.5
-    === (text (printf "%0.2f" value) # fc black <> strutY 1 <> strutX 3)
+    === (text annotation # fc black <> strutY 1.3 <> strutX (fromIntegral $ length annotation))
 
 ogive radius rho len baseDepth =
     -- dot norm((rho - radius, olen)) norm((rho, 0))
