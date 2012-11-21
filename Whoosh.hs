@@ -57,7 +57,7 @@ genEnergy :: State StdGen Double
 genEnergy = lognormal 1 0.75 100 1000
 
 genMass :: State StdGen Double
-genMass = lognormal 0.1 0.5 0.001 (1/100)
+genMass = lognormal 0.01 0.55 0.001 (1/150)
 
 genGun :: State StdGen (Double, Double)
 genGun = do
@@ -68,8 +68,8 @@ genGun = do
 
 genBullet :: Double -> State StdGen Bullet
 genBullet mass = do
-  startingRatio <- lognormal 0.2 0.5 0.5 1
-  cylinderFrac <- uniform (1/5) (1/2)
+  startingRatio <- lognormal 0.1 0.5 0.5 1.2
+  cylinderFrac <- uniform (1/4) (1/2)
   let density = 11340 -- Lead, kg/m^3
       ratio = min 20 startingRatio
       totalVol = mass / density
