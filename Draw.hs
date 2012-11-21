@@ -31,10 +31,10 @@ ogive radius rho len baseDepth =
         (x1, y1) = normalize (rho, 0)
         rarc = (bezierFromSweep (Rad $ acos (x0 * x1 + y0 * y1))) # scale rho
         larc = rarc # reflectX
-        base = (straight $ r2 (0, -baseDepth))
-             : (straight $ r2 (2*radius, 0))
-             : (straight $ r2 (0, baseDepth))
-             : []
+        base = [ straight $ r2 (0, -baseDepth)
+               , straight $ r2 (2*radius, 0)
+               , straight $ r2 (0, baseDepth)
+               ]
     in pathLike (p2 (-radius, baseDepth)) True (base ++ rarc ++ map reverseSegment larc)
 
 normalize :: Floating t => (t, t) -> (t, t)
