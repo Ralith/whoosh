@@ -13,6 +13,7 @@ data Gun = Gun { muzzleVelocity :: Double -- m/s
                , barrelLength :: Double -- m
                , cartridge :: Cartridge
                }
+         deriving (Show)
 
 data Bullet = Bullet { bulletCaliber :: Double -- m
                      , bulletCylinderLen :: Double -- m
@@ -20,30 +21,15 @@ data Bullet = Bullet { bulletCaliber :: Double -- m
                      , bulletRho :: Double -- m
                      , bulletMass :: Double -- kg
                      }
+            deriving (Show)
 
 data Cartridge = Cartridge { bullet :: Bullet
                            , powderMass :: Double -- kg
                            }
+                 deriving (Show)
 
 fmtDouble :: Double -> String
 fmtDouble = printf "%0.2f"
-
-instance Show Gun where
-    show (Gun mv barl cart)
-        = "gun having " ++
-          "a " ++ fmtDouble (barl*100) ++ "cm barrel, " ++
-          "typically firing a " ++ show cart ++ " " ++
-          "at " ++ fmtDouble mv ++ "m/s"
-        where
-
-instance Show Cartridge where
-    show (Cartridge b p)
-        = "cartridge containing a " ++ show b ++ " and " ++ fmtDouble (p*1000) ++ " grams of powder"
-
-instance Show Bullet where
-    show (Bullet cal cyl ogive rho)
-        = fmtDouble (cal*1000) ++ "x" ++ fmtDouble ((cyl+ogive)*1000) ++ "mm bullet"
-          ++ " with ρ=" ++ fmtDouble (rho*1000) ++ "mm"
 
 normal :: (Floating a, Random a) => Rational -> Rational -> State StdGen a
 normal mu sigma = state $ sample (Normal mu sigma)
