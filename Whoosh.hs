@@ -55,10 +55,10 @@ genGun = do
 
 genBullet :: Double -> State StdGen Bullet
 genBullet mass = do
-  startingRatio <- lognormal 0.1 0.5 0.5 1.2
-  cylinderFrac <- uniform (1/4) (1/2)
+  startingRatio <- lognormal 0.5 0.5 0.5 (1/1.75)
+  cylinderFrac <- uniform (2/5) (1/2)
   let density = 11340 -- Lead, kg/m^3
-      ratio = min 20 startingRatio
+      ratio = min 5 startingRatio
       totalVol = mass / density
       cylinderVol = totalVol * cylinderFrac
       ogiveVol = totalVol * (1 - cylinderFrac)
