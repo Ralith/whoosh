@@ -14,12 +14,10 @@ import Whoosh
 main :: IO ()
 main = do
   gen <- newStdGen
-  defaultMain $ hcat $ map (scale 10 . bullet) $ evalState (replicateM 20 $ (genMass >>= genBullet) `frob` genMV) gen
+  defaultMain $ hcat $ map (scale 10 . bullet) $ evalState (replicateM 100 $ genMass >>= genBullet >>= (frob genMV)) gen
 
-frob x f = do
-  x' <- x
-  y <- f x'
-  return (x', y)
+frob :: Functor f => (a -> f b) -> a -> f (a, b)
+frob = liftM2 fmap (,)
 
 bullet ((Bullet cal cylLen ogiveLen rho mass), mv) = let magic = 500 in
     (scale magic $ (ogive (cal/2) rho ogiveLen cylLen) # fc black # lw 0)
