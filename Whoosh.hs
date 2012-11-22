@@ -40,6 +40,13 @@ lognormal mu sigma zero scale = state $ sample (LogNormal mu sigma zero scale)
 uniform :: Double -> Double -> State StdGen Double
 uniform a b = state $ randomR (a, b)
 
+genMV :: Bullet -> State StdGen Double
+genMV (Bullet caliber _ ogiveLen _ _) = do
+  let sharpness = ogiveLen / caliber
+  muzVee <- if sharpness > 1.5 then lognormal 0.2 0.5 (200+(log(sharpness*2)*200)) 200 else
+                                    lognormal 0.5 0.5 250 100
+  return (muzVee)
+
 genEnergy :: State StdGen Double
 genEnergy = lognormal 1 0.75 100 1000
 
