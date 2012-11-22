@@ -31,14 +31,14 @@ data Cartridge = Cartridge { bullet :: Bullet
 fmtDouble :: Double -> String
 fmtDouble = printf "%0.2f"
 
-normal :: (Floating a, Random a) => Rational -> Rational -> State StdGen a
+normal :: Double -> Double -> State StdGen Double
 normal mu sigma = state $ sample (Normal mu sigma)
 
-lognormal :: (Floating a, Random a) => Rational -> Rational -> Rational -> Rational -> State StdGen a
+lognormal :: Double -> Double -> Double -> Double -> State StdGen Double
 lognormal mu sigma zero scale = state $ sample (LogNormal mu sigma zero scale)
 
-uniform :: (Floating a, Random a) => Rational -> Rational -> State StdGen a
-uniform a b = state $ randomR (fromRational a, fromRational b)
+uniform :: Double -> Double -> State StdGen Double
+uniform a b = state $ randomR (a, b)
 
 genEnergy :: State StdGen Double
 genEnergy = lognormal 1 0.75 100 1000
