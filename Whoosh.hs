@@ -1,6 +1,7 @@
 module Whoosh ( Bullet(..)
               , genBullet
               , genMass
+              , genMV
               ) where
 
 import System.Random
